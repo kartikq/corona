@@ -44,7 +44,10 @@ def print_table(results):
 @click.option('--summary', is_flag=True, help='print summary statistics')
 @click.option('--date', default=None, help='filter by date YYYY-MM-DD')
 def execute_command(country, region, summary, date):
-    """This CLI presents COVID-19 case data - updated daily"""
+    """Command line interface for COVID-19 statistics.
+    Data sourced from Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). Also, Supported by ESRI Living Atlas Team and the Johns Hopkins University Applied Physics Lab (JHU APL).
+    https://systems.jhu.edu/research/public-health/ncov/
+    """
     config = initialize()
 
     dt = date if date is not None else config['last_update']
