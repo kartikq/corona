@@ -77,7 +77,7 @@ def execute_command(country, region, summary, date, plot):
             if plot:
                 # chart confirmed cases in specific country / region
                 data = dal.get_country_region_plot_data(country, region)
-                x,y = zip(*((result[2],result[3]) for result in data['results']))
+                x,y = zip(*((dateutil.parser.parse(result[2]).strftime('%m-%d'),result[3]) for result in data['results']))
                 plot_data(x,y, 'Number of confirmed cases in ' + region + ' / ' + country, 'Date', 'Confirmed')
             else:
                 # specific region details
