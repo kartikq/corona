@@ -1,0 +1,4 @@
+.vscode
+__pycache__
+data/corona.db
+corona_env
