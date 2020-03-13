@@ -66,5 +66,22 @@ class Dal:
         """
         return self.run_query(query, dt, country)
 
+    def get_country_region_details(self, dt, country, region):
+        query = """select country, region, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
+        from `cases` where date(date) = date(?) and country = ? and region = ? group by country, region, date(date);
+        """
+        return self.run_query(query, dt, country, region)
+
+    def get_country_region_plot_data(self, country, region):
+        query = """select country, region, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
+        from `cases` where country = ? and region = ? group by country, region, date(date) order by date(date) asc;
+        """
+        return self.run_query(query, country, region)
+
+    def get_country_plot_data(self, country):
+        query = """select country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
+        from `cases` where country = ? group by country, date(date) order by date(date) asc;
+        """
+        return self.run_query(query, country)
     
 
