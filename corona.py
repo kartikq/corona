@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 def pull_latest_data(data_dir):
     g = git.cmd.Git(data_dir + 'COVID-19/')
-    g.pull() 
+    g.pull()
 
 def initialize():
     base_dir = os.path.dirname(os.path.realpath(__file__)) + '/'

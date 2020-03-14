@@ -4,6 +4,7 @@ from datetime import datetime
 import glob, os
 import git
 import dateutil.parser
+import sys
 
 class Dal:
     def __init__(self, data_dir):
@@ -17,6 +18,18 @@ class Dal:
         c.execute('''CREATE TABLE if not exists cases (date text, country text, region text, confirmed integer, deaths integer, recovered integer)''')
         self.conn.commit()
 
+    def cleanup_province_key(self, d):
+        # ugly hack because the file headers are often mangled
+        if 'Province/State' in d.keys():
+            return d['Province/State']
+        if '\ufeffProvince/State' in d.keys():
+            return d['\ufeffProvince/State']
+    
+    def get_date_from_file(self, filepath):
+        # ugly hack to use date from filename instead of column because column values are incorrect
+        base=os.path.basename(filepath)
+        return os.path.splitext(base)[0]
+
     def import_data(self, daily_reports_dir, date):
         c = self.conn.cursor()
         files = glob.glob(daily_reports_dir + '*.csv') if date is None else [daily_reports_dir + date + '.csv']
@@ -25,9 +38,13 @@ class Dal:
             try:
                 with open(file,'r') as fin:
                     dr = csv.DictReader(fin)
-                    to_db = [(i['Last Update'], i['Country/Region'], i['Province/State'], i['Confirmed'],i['Deaths'],i['Recovered']) for i in dr]
+                    # do not use 'Last Update' column from file, it is often incorrect
+                    date_from_file = dateutil.parser.parse(self.get_date_from_file(file)).strftime('%Y-%m-%d')
+                    print(date_from_file)
+                    to_db = [(date_from_file, i['Country/Region'], self.cleanup_province_key(i), i['Confirmed'],i['Deaths'],i['Recovered']) for i in dr]
                     c.executemany("INSERT INTO cases (date, country, region, confirmed, deaths, recovered) VALUES (?, ?, ?, ?, ?, ?);", to_db)
             except:
+                print(sys.exc_info())
                 continue    
         self.conn.commit()
 
