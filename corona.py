@@ -23,7 +23,7 @@ def initialize():
 
     dal = Dal(data_dir)
     dal.create_database()
-    dt_raw = dal.get_max_updated_date()[0]
+    dt_raw = dal.get_max_updated_date()
 
     if (dt_raw is None) or (datetime.now().date() > dateutil.parser.parse(dt_raw).date()):
         pull_latest_data(data_dir)
@@ -31,7 +31,7 @@ def initialize():
             dal.import_data(daily_reports_dir, dt_raw) 
         else:
             dal.import_data(daily_reports_dir, datetime.now().strftime('%m-%d-%Y'))
-        dt_raw = dal.get_max_updated_date()[0]
+        dt_raw = dal.get_max_updated_date()
     
     return {'dal': dal, 'last_update': dt_raw}
 

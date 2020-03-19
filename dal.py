@@ -17,15 +17,20 @@ class Dal:
         c = self.conn.cursor()
         c.execute('''CREATE TABLE if not exists cases (date text, country text, region text, confirmed integer, deaths integer, recovered integer)''')
         self.conn.commit()
+    
+    def destroy_database(self):
+        c = self.conn.cursor()
+        c.execute('''DROP TABLE if exists cases''')
+        self.conn.commit()
 
-    def cleanup_province_key(self, d):
+    def __cleanup_province_key(self, d):
         # ugly hack because the file headers are often mangled
         if 'Province/State' in d.keys():
             return d['Province/State']
         if '\ufeffProvince/State' in d.keys():
             return d['\ufeffProvince/State']
     
-    def get_date_from_file(self, filepath):
+    def __get_date_from_file(self, filepath):
         # ugly hack to use date from filename instead of column because column values are incorrect
         base=os.path.basename(filepath)
         return os.path.splitext(base)[0]
@@ -39,12 +44,12 @@ class Dal:
                 with open(file,'r') as fin:
                     dr = csv.DictReader(fin)
                     # do not use 'Last Update' column from file, it is often incorrect
-                    date_from_file = dateutil.parser.parse(self.get_date_from_file(file)).strftime('%Y-%m-%d')
+                    date_from_file = dateutil.parser.parse(self.__get_date_from_file(file)).strftime('%Y-%m-%d')
                     print(date_from_file)
-                    to_db = [(date_from_file, i['Country/Region'], self.cleanup_province_key(i), i['Confirmed'],i['Deaths'],i['Recovered']) for i in dr]
+                    to_db = [(date_from_file, i['Country/Region'], self.__cleanup_province_key(i), i['Confirmed'],i['Deaths'],i['Recovered']) for i in dr]
                     c.executemany("INSERT INTO cases (date, country, region, confirmed, deaths, recovered) VALUES (?, ?, ?, ?, ?, ?);", to_db)
             except:
-                print(sys.exc_info())
+                # Skip file in case it has not been uploaded yet
                 continue    
         self.conn.commit()
 
@@ -57,7 +62,7 @@ class Dal:
     def get_max_updated_date(self):
         c = self.conn.cursor()
         c.execute('SELECT max(date) FROM cases')
-        return c.fetchone()
+        return c.fetchone()[0]
 
     def get_overall_details(self, dt):
         query = """select country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR  

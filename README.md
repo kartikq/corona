@@ -18,12 +18,13 @@ Options:
   --region TEXT   filter by region (requires country)
   --summary       print summary statistics
   --date TEXT     filter by date YYYY-MM-DD
-  --help          Show this message and exit.
+  --plot          plot trends (requires country or country + region)
+  --help          Show this message and exit
 ```
 
 ## Installation
 
-```bash
+```
 $ git clone https://github.com/kartikq/corona.git 
 
 $ git submodule init
