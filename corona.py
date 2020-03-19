@@ -1,39 +1,19 @@
 #!/usr/bin/env python3
-
-import sqlite3
-import csv
+import os
 from datetime import datetime
-import glob, os
-import git
 import dateutil.parser
 import click
 from tabulate import tabulate
 from dal import Dal
 import matplotlib.pyplot as plt
-
-
-def pull_latest_data(data_dir):
-    g = git.cmd.Git(data_dir + 'COVID-19/')
-    g.pull()
+from importer import Importer
 
 def initialize():
     base_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
     data_dir = base_dir + 'data/'
-    daily_reports_dir = data_dir + '/COVID-19/csse_covid_19_data/csse_covid_19_daily_reports/'
-
     dal = Dal(data_dir)
-    dal.create_database()
-    dt_raw = dal.get_max_updated_date()
-
-    if (dt_raw is None) or (datetime.now().date() > dateutil.parser.parse(dt_raw).date()):
-        pull_latest_data(data_dir)
-        if dt_raw is None: 
-            dal.import_data(daily_reports_dir, dt_raw) 
-        else:
-            dal.import_data(daily_reports_dir, datetime.now().strftime('%m-%d-%Y'))
-        dt_raw = dal.get_max_updated_date()
-    
-    return {'dal': dal, 'last_update': dt_raw}
+    importer = Importer(data_dir, dal)
+    return {'dal': dal, 'importer': importer}
 
 def print_table(results):
     res = results['results']
@@ -53,15 +33,21 @@ def plot_data(x, y, title, xlabel, ylabel):
 @click.option('--summary', is_flag=True, help='print summary statistics')
 @click.option('--date', default=None, help='filter by date YYYY-MM-DD')
 @click.option('--plot', is_flag=True, help='plot trends, (requires country or country + region arguments)')
-def execute_command(country, region, summary, date, plot):
+@click.option('--reload', is_flag=True, help='reload all data')
+def execute_command(country, region, summary, date, plot, reload):
     """Command line interface for COVID-19 statistics.
     Data sourced from Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). Also, Supported by ESRI Living Atlas Team and the Johns Hopkins University Applied Physics Lab (JHU APL).
     https://systems.jhu.edu/research/public-health/ncov/
     """
     config = initialize()
-
-    dt = date if date is not None else config['last_update']
     dal = config['dal']
+    importer = config['importer']
+    
+    if reload:
+        importer.import_all()
+        exit(0)
+
+    dt = date if date is not None else dal.get_max_updated_date()
 
     if country is None:
         # world wide numbers

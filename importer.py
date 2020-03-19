@@ -1,4 +1,50 @@
+import git
+import glob, os
+from os import path
+import csv
+import dateutil.parser
 
 class Importer:
-    def __init__(self, dal):
+    def __init__(self, data_dir, dal):
         self.dal = dal
+        self.data_dir = data_dir
+        self.daily_reports_dir = data_dir + '/COVID-19/csse_covid_19_data/csse_covid_19_daily_reports/'
+
+    def __pull_latest_data(self):
+        g = git.cmd.Git(self.data_dir + 'COVID-19/')
+        g.pull()
+
+    def __cleanup_province_key(self, d):
+            # ugly hack because the file headers are often mangled
+        if 'Province/State' in d.keys():
+            return d['Province/State']
+        if '\ufeffProvince/State' in d.keys():
+            return d['\ufeffProvince/State']
+
+    def __get_date_from_file(self, filepath):
+            # ugly hack to use date from filename instead of column because column values are incorrect
+        base=os.path.basename(filepath)
+        return os.path.splitext(base)[0]
+
+    def __import_files(self, files):
+        for file in files:
+            with open(file,'r') as fin:
+                dr = csv.DictReader(fin)
+                # do not use 'Last Update' column from file, it is often incorrect instead infer date from file name
+                date_from_file = dateutil.parser.parse(self.__get_date_from_file(file)).strftime('%Y-%m-%d')
+                to_db = [(date_from_file, i['Country/Region'], self.__cleanup_province_key(i), i['Confirmed'],i['Deaths'],i['Recovered']) for i in dr]
+                self.dal.insert_case_data(to_db)
+
+    def import_date(self, date):
+        self.__pull_latest_data()
+        date_formatted = date.strftime('%m-%d-%Y')
+        file = self.daily_reports_dir + date_formatted + '.csv'
+        if path.exists(file):
+            self.__import_files([file])
+
+    def import_all(self):
+        self.dal.destroy_database()
+        self.dal.create_database()
+        self.__pull_latest_data()
+        files = glob.glob(self.daily_reports_dir + '*.csv')
+        self.__import_files(files)

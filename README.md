@@ -19,6 +19,7 @@ Options:
   --summary       print summary statistics
   --date TEXT     filter by date YYYY-MM-DD
   --plot          plot trends (requires country or country + region)
+  --reload        reload all data
   --help          Show this message and exit
 ```
 
@@ -32,4 +33,17 @@ $ git submodule init
 $ git submodule update
 
 $ pip install -r requirements.txt
+
+```
+
+## Loading the case information
+
+Post installation peform a one time import of all information
+```
+$ ./corona.py --reload
+```
+
+Set up hourly job to import latest data when available
+```
+$ nohup ./import_job.py &
 ```
