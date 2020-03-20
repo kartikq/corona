@@ -49,36 +49,19 @@ def execute_command(country, region, summary, date, plot, reload):
 
     dt = date if date is not None else dal.get_max_updated_date()
 
-    if country is None:
-        # world wide numbers
-        if summary:
-            # world wide summary
-            print_table(dal.get_overall_summary(dt))
-        else:
-            # world wide details - country wise breakdown
-            print_table(dal.get_overall_details(dt))
-    else:
-        # specific country is provided
-        if region:
-            if plot:
-                # chart confirmed cases in specific country / region
-                data = dal.get_country_region_plot_data(country, region)
-                x,y = zip(*((dateutil.parser.parse(result[2]).strftime('%m-%d'),result[3]) for result in data['results']))
-                plot_data(x,y, 'Number of confirmed cases in ' + region + ' / ' + country, 'Date', 'Confirmed')
-            else:
-                # specific region details
-                print_table(dal.get_country_region_details(dt, country, region))
-        elif plot:
-            # chart confirmed cases in specific country
-            data = dal.get_country_plot_data(country)
-            x,y = zip(*((dateutil.parser.parse(result[1]).strftime('%m-%d'),result[2]) for result in data['results'] if result[1] is not None))
-            plot_data(x,y, 'Number of confirmed cases in ' + country, 'Date', 'Confirmed')
-        elif summary:
-            # specific country summary
-            print_table(dal.get_country_summary(dt, country))
-        else:
-            # specific country detail - lists all regions with stats
-            print_table(dal.get_country_details(dt, country))
+    if summary:
+        print_table(dal.get_summary(dt, country))
+        exit(0)
+    
+    if plot:
+        if country is not None:
+            data = dal.get_plot_data(country, region)
+            x,y = zip(*((dateutil.parser.parse(result[1]).strftime('%m-%d'),result[2]) for result in data['results']))
+            title = 'Number of confirmed cases in {} {}'.format(region, country)
+            plot_data(x,y, title, 'Date', 'Confirmed')
+        exit(0)
+
+    print_table(dal.get_details(dt, country, region))
 
 if __name__ == '__main__':
     execute_command()
