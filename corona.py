@@ -7,6 +7,7 @@ from tabulate import tabulate
 from dal import Dal
 import matplotlib.pyplot as plt
 from importer import Importer
+import pandas as pd
 
 def initialize():
     base_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
@@ -19,13 +20,6 @@ def print_table(results):
     res = results['results']
     headers = results['columns']
     print(tabulate(res,headers=headers))
-
-def plot_data(x, y, title, xlabel, ylabel):
-    plt.scatter(x, y, s=60, c='red', marker='^')
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.show()
 
 @click.command()
 @click.option('--country', default=None, help='filter by country')
@@ -55,10 +49,11 @@ def execute_command(country, region, summary, date, plot, reload):
     
     if plot:
         if country is not None:
-            data = dal.get_plot_data(country, region)
-            x,y = zip(*((dateutil.parser.parse(result[1]).strftime('%m-%d'),result[2]) for result in data['results']))
-            title = 'Number of confirmed cases in {} {}'.format(region, country)
-            plot_data(x,y, title, 'Date', 'Confirmed')
+            data_raw = dal.get_plot_data(country, region)
+            data = pd.DataFrame(data_raw['results'], columns=data_raw['columns'])
+            plt.close('all')
+            data.plot('date',y=['confirmed','deaths'])
+            plt.show()  
         exit(0)
 
     print_table(dal.get_details(dt, country, region))
