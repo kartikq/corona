@@ -48,9 +48,9 @@ Set up hourly job to import latest data when available
 $ nohup ./import_job.py &
 ```
 
-## License
-MIT © Kartik Vishwanath
-SOURCES: , and all of the following:
+## License & Conduct
+* MIT © Kartik Vishwanath
+* [Code of Conduct](code-of-conduct.md)
 
 ### Sources
 1. Johns Hopkins University Center for Systems Science and Engineering - https://systems.jhu.edu/research/public-health/ncov/
