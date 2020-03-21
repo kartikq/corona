@@ -38,7 +38,7 @@ $ pip install -r requirements.txt
 
 ## Loading the case information
 
-Post installation peform a one time import of all information
+Post installation peform a one time import
 ```
 $ ./corona.py --reload
 ```
