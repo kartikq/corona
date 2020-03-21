@@ -18,7 +18,7 @@ Options:
   --region TEXT   filter by region (requires country)
   --summary       print summary statistics
   --date TEXT     filter by date YYYY-MM-DD
-  --plot          plot trends (requires country or country + region)
+  --plot          plot trends
   --reload        reload all data
   --help          Show this message and exit
 ```
