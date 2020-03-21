@@ -2,7 +2,7 @@
 
 This package provides a command line interface for presenting current COVID-19 statistics. 
 Data is sourced from Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). 
-Also, Supported by ESRI Living Atlas Team and the Johns Hopkins University Applied Physics Lab (JHU APL).
+Also, supported by ESRI Living Atlas Team and the Johns Hopkins University Applied Physics Lab (JHU APL).
 https://systems.jhu.edu/research/public-health/ncov/
 ## Usage
 ```
@@ -47,3 +47,10 @@ Set up hourly job to import latest data when available
 ```
 $ nohup ./import_job.py &
 ```
+
+## License
+MIT © Kartik Vishwanath
+SOURCES: , and all of the following:
+
+### Sources
+1. Johns Hopkins University Center for Systems Science and Engineering - https://systems.jhu.edu/research/public-health/ncov/
