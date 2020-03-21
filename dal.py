@@ -90,12 +90,27 @@ class Dal:
         return self.__run_query(query, dt, country, region)
 
     def get_plot_data(self, country, region):
-        if region is None:
-            return self.get_country_plot_data(country)
-        else:
-            return self.get_country_region_plot_data(country, region)
+        if country is None:
+            query = """
+            select country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
+            from `cases` where country = 'US' group by country, date(date)
+            union all
+            select country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
+            from `cases` where country = 'China' group by country, date(date)
+            union all
+            select country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
+            from `cases` where country = 'Italy' group by country, date(date)
+            union all
+            select 'World' as country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
+            from `cases` group by date(date) order by date(date) asc;
+            """
+            return self.__run_query(query)
+        return self.get_country_region_plot_data(country, region)
 
     def get_country_region_plot_data(self, country, region):
+        if region is None:
+            return self.get_country_plot_data(country)
+        
         query = """select country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR, region 
         from `cases` where country = ? and region = ? group by country, region, date(date) order by date(date) asc;
         """

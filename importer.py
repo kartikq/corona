@@ -14,6 +14,12 @@ class Importer:
         g = git.cmd.Git(self.data_dir + 'COVID-19/')
         g.pull()
 
+    def __normalize_country_names(self, country):
+        if country=='Mainland China':
+            return 'China'
+        else: 
+            return country
+
     def __cleanup_province_key(self, d):
             # ugly hack because the file headers are often mangled
         if 'Province/State' in d.keys():
@@ -32,7 +38,7 @@ class Importer:
                 dr = csv.DictReader(fin)
                 # do not use 'Last Update' column from file, it is often incorrect instead infer date from file name
                 date_from_file = dateutil.parser.parse(self.__get_date_from_file(file)).strftime('%Y-%m-%d')
-                to_db = [(date_from_file, i['Country/Region'], self.__cleanup_province_key(i), i['Confirmed'],i['Deaths'],i['Recovered']) for i in dr]
+                to_db = [(date_from_file, self.__normalize_country_names(i['Country/Region']), self.__cleanup_province_key(i), i['Confirmed'],i['Deaths'],i['Recovered']) for i in dr]
                 self.dal.insert_case_data(to_db)
 
     def import_date(self, date):

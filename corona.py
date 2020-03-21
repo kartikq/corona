@@ -6,6 +6,7 @@ import click
 from tabulate import tabulate
 from dal import Dal
 import matplotlib.pyplot as plt
+from matplotlib import style
 from importer import Importer
 import pandas as pd
 
@@ -18,8 +19,26 @@ def initialize():
 
 def print_table(results):
     res = results['results']
-    headers = results['columns']
-    print(tabulate(res,headers=headers))
+    columns = results['columns']
+    print(tabulate(res,headers=columns))
+
+def plot_data(results, *titles):
+    style.use('dark_background')
+    res = results['results']
+    columns = results['columns']
+    data = pd.DataFrame(res, columns=columns)
+    data_pivot1 = data.pivot(index='date', columns='country', values=['confirmed'])
+    data_pivot2 = data.pivot(index='date', columns='country', values=['deaths'])
+    plt.close('all')
+    fig, axes = plt.subplots(nrows=1,ncols=2,figsize=(12,6))
+    data_pivot1.plot(ax = axes[0], title=titles[0])
+    data_pivot2.plot(ax = axes[1], title=titles[1])
+    for ax in axes:
+        # Fix odd formatting of labels with pivot tables
+        handles, labels = ax.get_legend_handles_labels()
+        labels_new = [label.strip('()').split(',')[1] for label in labels]
+        ax.legend(handles,labels_new)
+    plt.show()  
 
 @click.command()
 @click.option('--country', default=None, help='filter by country')
@@ -48,12 +67,12 @@ def execute_command(country, region, summary, date, plot, reload):
         exit(0)
     
     if plot:
-        if country is not None:
-            data_raw = dal.get_plot_data(country, region)
-            data = pd.DataFrame(data_raw['results'], columns=data_raw['columns'])
-            plt.close('all')
-            data.plot('date',y=['confirmed','deaths'])
-            plt.show()  
+        data = dal.get_plot_data(country, region)
+        title1 = 'Confirmed cases {} {}'
+        title2 = 'Deaths {} {}'
+        rgn = '' if region is None else region
+        cntry = 'US, China, Italy, Worldwide' if country is None else country
+        plot_data(data, title1.format(rgn,cntry), title2.format(rgn, cntry))
         exit(0)
 
     print_table(dal.get_details(dt, country, region))
