@@ -13,7 +13,7 @@ class Importer:
     def __pull_latest_data(self):
         repo = git.Repo(os.path.dirname(os.path.realpath(__file__)))
         for submodule in repo.submodules:
-            submodule.update(init=True)
+            submodule.update(init=True, to_latest_revision=True)
 
     def __normalize_country_names(self, country):
         if country=='Mainland China':
