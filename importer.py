@@ -11,8 +11,9 @@ class Importer:
         self.daily_reports_dir = data_dir + '/COVID-19/csse_covid_19_data/csse_covid_19_daily_reports/'
 
     def __pull_latest_data(self):
-        g = git.cmd.Git(self.data_dir + 'COVID-19/')
-        g.pull()
+        repo = git.Repo(os.path.dirname(os.path.realpath(__file__)))
+        for submodule in repo.submodules:
+            submodule.update(init=True)
 
     def __normalize_country_names(self, country):
         if country=='Mainland China':
