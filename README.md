@@ -23,6 +23,24 @@ Options:
   --help          Show this message and exit
 ```
 
+### World wide
+[![](./.github/default_comp2.gif)](./../../)
+
+### Country details
+[![](./.github/country_breakdown_comp2.gif)](./../../)
+
+### Country,Region Details
+[![](./.github/region_summary_comp2.gif)](./../../)
+
+### Plots - World wide summary 
+[![](./.github/all_plot_comp2.gif)](./../../)
+
+### Plots - Country
+[![](./.github/country_plot_comp2.gif)](./../../)
+
+### Plots - Country, Region
+[![](./.github/region_plot_comp2.gif)](./../../)
+
 ## Installation
 
 ```
