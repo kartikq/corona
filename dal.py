@@ -102,7 +102,7 @@ class Dal:
             from `cases` where country = 'Italy' group by country, date(date)
             union all
             select 'World' as country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
-            from `cases` group by date(date) order by date(date) asc;
+            from `cases` group by date(date) order by date asc;
             """
             return self.__run_query(query)
         return self.get_country_region_plot_data(country, region)
