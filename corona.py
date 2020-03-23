@@ -13,6 +13,7 @@ import pandas as pd
 def initialize():
     base_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
     data_dir = base_dir + 'data/'
+    style.use('dark_background')
     dal = Dal(data_dir)
     importer = Importer(data_dir, dal)
     return {'dal': dal, 'importer': importer}
@@ -23,7 +24,6 @@ def print_table(results):
     print(tabulate(res,headers=columns))
 
 def plot_data(results, *titles):
-    style.use('dark_background')
     res = results['results']
     columns = results['columns']
     data = pd.DataFrame(res, columns=columns)
