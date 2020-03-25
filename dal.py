@@ -16,7 +16,7 @@ class Dal:
     def create_database(self):
         c = self.conn.cursor()
         ddl = """
-        CREATE TABLE if not exists cases (date text, country text, region text, confirmed integer, deaths integer, recovered integer, unique(date, country, region)) 
+        CREATE TABLE if not exists cases (id integer primary key autoincrement, date text, country text, region text, confirmed integer, deaths integer, recovered integer, unique(id, date, country, region)) 
         """
         c.execute(ddl)
         self.conn.commit()

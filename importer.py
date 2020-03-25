@@ -21,15 +21,14 @@ class Importer:
         else: 
             return country
 
-    def __cleanup_province_key(self, d):
-            # ugly hack because the file headers are often mangled
-        if 'Province/State' in d.keys():
-            return d['Province/State']
-        if '\ufeffProvince/State' in d.keys():
-            return d['\ufeffProvince/State']
+    def __get_by_substr(self, d, s):
+        # ugly hack because the file headers are often mangled
+        for k in d.keys(): 
+            if s.lower() in k.lower():
+                return d[k]
 
     def __get_date_from_file(self, filepath):
-            # ugly hack to use date from filename instead of column because column values are incorrect
+        # ugly hack to use date from filename instead of column because column values are incorrect
         base=os.path.basename(filepath)
         return os.path.splitext(base)[0]
 
@@ -39,7 +38,7 @@ class Importer:
                 dr = csv.DictReader(fin)
                 # do not use 'Last Update' column from file, it is often incorrect instead infer date from file name
                 date_from_file = dateutil.parser.parse(self.__get_date_from_file(file)).strftime('%Y-%m-%d')
-                to_db = [(date_from_file, self.__normalize_country_names(i['Country/Region']), self.__cleanup_province_key(i), i['Confirmed'],i['Deaths'],i['Recovered']) for i in dr]
+                to_db = [(date_from_file, self.__normalize_country_names(self.__get_by_substr(i, 'Country')), self.__get_by_substr(i,'State'), self.__get_by_substr(i,'Confirmed'), self.__get_by_substr(i,'Deaths'), self.__get_by_substr(i,'Recovered')) for i in dr]
                 self.dal.insert_case_data(to_db)
 
     def import_date(self, date):
