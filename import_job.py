@@ -17,6 +17,8 @@ def import_job():
 schedule.every().hour.do(import_job)
 
 if __name__ == '__main__':
+    # run once
+    import_job()
     while True:
         schedule.run_pending()
         time.sleep(1)

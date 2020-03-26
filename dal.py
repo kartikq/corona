@@ -16,7 +16,7 @@ class Dal:
     def create_database(self):
         c = self.conn.cursor()
         ddl = """
-        CREATE TABLE if not exists cases (id integer primary key autoincrement, date text, country text, region text, confirmed integer, deaths integer, recovered integer, unique(id, date, country, region)) 
+        CREATE TABLE if not exists cases (id integer primary key autoincrement, date text, country text, region text, confirmed integer, deaths integer, recovered integer, lat text, long text, unique(date, country, region, lat, long)) 
         """
         c.execute(ddl)
         self.conn.commit()
@@ -35,7 +35,7 @@ class Dal:
     def insert_case_data(self, rows):
         c = self.conn.cursor()
         query = """
-        INSERT OR IGNORE INTO cases (date, country, region, confirmed, deaths, recovered) VALUES (?, ?, ?, ?, ?, ?);
+        INSERT OR IGNORE INTO cases (date, country, region, confirmed, deaths, recovered, lat, long) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         """
         c.executemany(query, rows)
         self.conn.commit()
