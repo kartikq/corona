@@ -19,27 +19,18 @@ Options:
   --summary       print summary statistics
   --date TEXT     filter by date YYYY-MM-DD
   --plot          plot trends
+  --logplot       plot trends logarithmic scale
   --reload        reload all data
   --help          Show this message and exit
 ```
 
-### World wide
-[![](./.github/default_comp2.gif)](./../../)
+World wide   |  Country details  | Country,Region Details 
+:-----------:|:-----------------:|:----------------------:
+[![](./.github/default_comp2.gif)](./../../) | [![](./.github/country_breakdown_comp2.gif)](./../../) | [![](./.github/region_summary_comp2.gif)](./../../)
 
-### Country details
-[![](./.github/country_breakdown_comp2.gif)](./../../)
-
-### Country,Region Details
-[![](./.github/region_summary_comp2.gif)](./../../)
-
-### Plots - World wide summary 
-[![](./.github/all_plot_comp2.gif)](./../../)
-
-### Plots - Country
-[![](./.github/country_plot_comp2.gif)](./../../)
-
-### Plots - Country, Region
-[![](./.github/region_plot_comp2.gif)](./../../)
+Plots - World wide summary | Plots - Country | Plots - Country, Region
+:-------------------------:|:---------------:|:-----------------------:|
+[![](./.github/all_plot_comp2.gif)](./../../) | [![](./.github/country_plot_comp2.gif)](./../../) | [![](./.github/region_plot_comp2.gif)](./../../)
 
 ## Installation
 

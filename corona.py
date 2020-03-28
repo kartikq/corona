@@ -23,7 +23,7 @@ def print_table(results):
     columns = results['columns']
     print(tabulate(res,headers=columns))
 
-def plot_data(results, *titles):
+def plot_data(results, logplot, *titles):
     res = results['results']
     columns = results['columns']
     data = pd.DataFrame(res, columns=columns)
@@ -31,8 +31,8 @@ def plot_data(results, *titles):
     data_pivot2 = data.pivot(index='date', columns='country', values=['deaths'])
     plt.close('all')
     fig, axes = plt.subplots(nrows=1,ncols=2,figsize=(12,6))
-    data_pivot1.plot(ax = axes[0], title=titles[0])
-    data_pivot2.plot(ax = axes[1], title=titles[1])
+    data_pivot1.plot(ax = axes[0], title=titles[0], logy=logplot)
+    data_pivot2.plot(ax = axes[1], title=titles[1], logy=logplot)
     for ax in axes:
         # Fix odd formatting of labels with pivot tables
         handles, labels = ax.get_legend_handles_labels()
@@ -45,9 +45,10 @@ def plot_data(results, *titles):
 @click.option('--region', default=None, help='filter by region (requires country)')
 @click.option('--summary', is_flag=True, help='print summary statistics')
 @click.option('--date', default=None, help='filter by date YYYY-MM-DD')
-@click.option('--plot', is_flag=True, help='plot trends, (requires country or country + region arguments)')
+@click.option('--plot', is_flag=True, help='plot trends')
+@click.option('--logplot', is_flag=True, help='plot trends logarithmic scale')
 @click.option('--reload', is_flag=True, help='reload all data')
-def execute_command(country, region, summary, date, plot, reload):
+def execute_command(country, region, summary, date, plot,logplot, reload):
     """Command line interface for COVID-19 statistics.
     Data sourced from Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). Also, Supported by ESRI Living Atlas Team and the Johns Hopkins University Applied Physics Lab (JHU APL).
     https://systems.jhu.edu/research/public-health/ncov/
@@ -66,13 +67,13 @@ def execute_command(country, region, summary, date, plot, reload):
         print_table(dal.get_summary(dt, country))
         exit(0)
     
-    if plot:
+    if plot or logplot:
         data = dal.get_plot_data(country, region)
         title1 = 'Confirmed cases {} {}'
         title2 = 'Deaths {} {}'
         rgn = '' if region is None else region
         cntry = 'US, China, Italy, Worldwide' if country is None else country
-        plot_data(data, title1.format(rgn,cntry), title2.format(rgn, cntry))
+        plot_data(data, logplot, title1.format(rgn,cntry), title2.format(rgn, cntry))
         exit(0)
 
     print_table(dal.get_details(dt, country, region))
