@@ -101,6 +101,9 @@ class Dal:
             select country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
             from `cases` where country = 'Italy' group by country, date(date)
             union all
+            select country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
+            from `cases` where country = 'Spain' group by country, date(date)
+            union all
             select 'World' as country, date(date) as date, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(deaths)*1.0/sum(confirmed)*100 as CFR 
             from `cases` group by date(date) order by date asc;
             """
