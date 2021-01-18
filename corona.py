@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import os
+import sys
+import traceback
 from datetime import datetime
 import dateutil.parser
 import click
@@ -53,30 +55,33 @@ def execute_command(country, region, summary, date, plot,logplot, reload):
     Data sourced from Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). Also, Supported by ESRI Living Atlas Team and the Johns Hopkins University Applied Physics Lab (JHU APL).
     https://systems.jhu.edu/research/public-health/ncov/
     """
-    config = initialize()
-    dal = config['dal']
-    importer = config['importer']
-    
-    if reload:
-        importer.import_all()
-        exit(0)
+    try:
+        config = initialize()
+        dal = config['dal']
+        importer = config['importer']
 
-    dt = date if date is not None else dal.get_max_updated_date()
+        if reload:
+            importer.import_all()
+            exit(0)
 
-    if summary:
-        print_table(dal.get_summary(dt, country))
-        exit(0)
-    
-    if plot or logplot:
-        data = dal.get_plot_data(country, region)
-        title1 = 'Confirmed cases {} {}'
-        title2 = 'Deaths {} {}'
-        rgn = '' if region is None else region
-        cntry = 'US, China, Italy, Worldwide' if country is None else country
-        plot_data(data, logplot, title1.format(rgn,cntry), title2.format(rgn, cntry))
-        exit(0)
+        dt = date if date is not None else dal.get_max_updated_date()
 
-    print_table(dal.get_details(dt, country, region))
+        if summary:
+            print_table(dal.get_summary(dt, country))
+            exit(0)
+
+        if plot or logplot:
+            data = dal.get_plot_data(country, region)
+            title1 = 'Confirmed cases {} {}'
+            title2 = 'Deaths {} {}'
+            rgn = '' if region is None else region
+            cntry = 'US, China, Italy, Worldwide' if country is None else country
+            plot_data(data, logplot, title1.format(rgn,cntry), title2.format(rgn, cntry))
+            exit(0)
+
+        print_table(dal.get_details(dt, country, region))
+    except Exception:
+        traceback.print_exc(file=sys.stdout)
 
 if __name__ == '__main__':
     execute_command()
